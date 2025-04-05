@@ -1,0 +1,10 @@
+# Ignorowanie folderu .vs
+.vs/
+
+# Ignorowanie plików bin i obj (często generowane przez kompilator)
+bin/
+obj/
+
+# Ignorowanie plików .user i .suo
+*.user
+*.suo
