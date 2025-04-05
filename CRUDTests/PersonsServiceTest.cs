@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xunit.Abstractions;
 
 namespace CRUDTests
 {
@@ -15,12 +16,14 @@ namespace CRUDTests
         //private fields
         private readonly IPersonsService _personService;
         private readonly ICountriesService _countriesService;
+        private readonly ITestOutputHelper _outputHelper;
 
         //constructor
-        public PersonsServiceTest()
+        public PersonsServiceTest(ITestOutputHelper testOutputHelper)
         {
             _personService = new PersonsService();
             _countriesService = new CountriesService();
+            _outputHelper = testOutputHelper;
         }
 
         #region AddPeron
@@ -141,11 +144,25 @@ namespace CRUDTests
                 person_response_list_from_add.Add(_personService.AddPerson(person_request));
             }
 
+            //print person_response_list_from_add
+            _outputHelper.WriteLine("Expected:");
+            foreach(PersonResponse person_response_from_add in person_response_list_from_add)
+            {
+                _outputHelper.WriteLine(person_response_from_add.ToString());
+            }
+
             //Act
             List<PersonResponse> person_reponse_from_get = _personService.GetAllPersons();
 
+            //print person_reponse_from_get
+            _outputHelper.WriteLine("Actual:");
+            foreach (PersonResponse person_reponse_from_gett in person_reponse_from_get)
+            {
+                _outputHelper.WriteLine(person_reponse_from_gett.ToString());
+            }
+
             //Assert
-            foreach(PersonResponse person in person_response_list_from_add)
+            foreach (PersonResponse person in person_response_list_from_add)
             {
                 Assert.Contains(person, person_reponse_from_get);
             }
