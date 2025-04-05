@@ -131,5 +131,38 @@ namespace CRUDTests
             
         }
         #endregion
+
+        #region GetCountryByCountryID
+
+        [Fact]
+        //If we supply null as CountryID, it should return null as CountryResult
+        public void GetCountryByCountryID_NullCountryID()
+        {
+            //Arrange
+            Guid? countryID = null;
+
+            //Act
+            CountryResponse country_resposne_from_get_method = _countriesService.GetCountryByCountryID(countryID);
+
+            //Assert
+            Assert.Null(country_resposne_from_get_method);
+        }
+
+        [Fact]
+        //If we supply a valid countryID, it should return the matching country details as CountryResult object
+        public void GetCountryByCountryID_ValidCountryID()
+        {
+            //Arrange
+            CountryAddRequest? country_add_request = new CountryAddRequest() { CountryName = "Poland" };
+            CountryResponse country_resposne_from_add_request = _countriesService.AddCountry(country_add_request);
+            
+            //Act
+            CountryResponse? actual_country_response_from_get = _countriesService.GetCountryByCountryID(country_resposne_from_add_request.CountryID);
+
+            //Assert
+            Assert.Equal(country_resposne_from_add_request, actual_country_response_from_get);
+        }
+
+        #endregion
     }
 }
