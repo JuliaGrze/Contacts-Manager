@@ -4,13 +4,13 @@ using ServiceContracts.DTO;
 
 namespace Services
 {
-    public class CoutriesService : ICountriesService
+    public class CountriesService : ICountriesService
     {
         //private field
         private readonly List<Country> _countries;
 
         //constructor
-        public CoutriesService()
+        public CountriesService()
         {
             _countries = new List<Country>();
         }
@@ -49,7 +49,7 @@ namespace Services
         public CountryResponse? GetCountryByCountryID(Guid? countryID)
         {
             if(countryID == null) return null;
-            return _countries.FirstOrDefault(country => country.CountryID == countryID).ToCountryResponse();
+            return _countries.FirstOrDefault(country => country.CountryID == countryID)?.ToCountryResponse();
         }
     }
 }
