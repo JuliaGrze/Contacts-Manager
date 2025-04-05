@@ -365,5 +365,91 @@ namespace CRUDTests
         }
 
         #endregion
+
+        #region GetSortedPersons
+
+        
+
+        private List<PersonResponse> MakePersonResponseList()
+        {
+            CountryAddRequest country_add_request_1 = new CountryAddRequest() { CountryName = "UK" };
+            CountryAddRequest country_add_request_2 = new CountryAddRequest() { CountryName = "Poland" };
+
+            CountryResponse country_response_1 = _countriesService.AddCountry(country_add_request_1);
+            CountryResponse country_response_2 = _countriesService.AddCountry(country_add_request_2);
+
+            PersonAddRequest person_add_request_1 = new PersonAddRequest()
+            {
+                PersonName = "Mary",
+                Email = "person1@exmample.com",
+                DateOfBirth = DateTime.Parse("2003-03-03"),
+                Gender = GenderOptions.Female,
+                CountryID = country_response_1.CountryID,
+                Address = "addres1",
+                ReceiveNewsLetters = true
+            };
+            PersonAddRequest person_add_request_2 = new PersonAddRequest()
+            {
+                PersonName = "Rahman",
+                Email = "person2@exmample.com",
+                DateOfBirth = DateTime.Parse("2003-03-03"),
+                Gender = GenderOptions.Male,
+                CountryID = country_response_2.CountryID,
+                Address = "addres2",
+                ReceiveNewsLetters = false
+            };
+
+            List<PersonAddRequest> person_add_requests = new List<PersonAddRequest>()
+            {
+                person_add_request_1, person_add_request_2
+            };
+
+            List<PersonResponse> person_response_list_from_add = new List<PersonResponse>();
+
+            foreach (PersonAddRequest person_request in person_add_requests)
+            {
+                person_response_list_from_add.Add(_personService.AddPerson(person_request));
+            }
+
+            //print person_response_list_from_add
+            _outputHelper.WriteLine("Expected:");
+            foreach (PersonResponse person_response_from_add in person_response_list_from_add)
+            {
+                _outputHelper.WriteLine(person_response_from_add.ToString());
+            }
+            return person_response_list_from_add;
+        }
+
+        [Fact]
+        //When we sort based on PersonNmae in DESC, it should return person list in descending way
+        public void GetSortedPersons_SearchByPersonName()
+        {
+            //Arrange
+            List<PersonResponse> person_response_list_from_add = MakePersonResponseList();
+
+
+            List<PersonResponse> allPersons = _personService.GetAllPersons();
+
+            //Act
+            List<PersonResponse> person_reponse_from_sort = _personService.GetSortedPersons(allPersons, nameof(Person.PersonName), SortOrderEnum.DESC);
+
+            //print person_reponse_from_get
+            _outputHelper.WriteLine("Actual:");
+            foreach (PersonResponse person in person_reponse_from_sort)
+            {
+                _outputHelper.WriteLine(person.ToString());
+            }
+
+            person_response_list_from_add = person_response_list_from_add.OrderByDescending(person => person.PersonName).ToList();
+
+            //Assert
+            for (int i = 0; i < person_response_list_from_add?.Count; i++)
+            {
+                Assert.Equal(person_response_list_from_add[i], person_reponse_from_sort[i]);
+            }
+
+        }
+
+        #endregion
     }
 }
