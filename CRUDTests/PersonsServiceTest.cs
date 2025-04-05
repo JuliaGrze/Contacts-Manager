@@ -14,11 +14,13 @@ namespace CRUDTests
     {
         //private fields
         private readonly IPersonsService _personService;
+        private readonly ICountriesService _countriesService;
 
         //constructor
         public PersonsServiceTest()
         {
             _personService = new PersonsService();
+            _countriesService = new CountriesService();
         }
 
         #region AddPeron
@@ -83,15 +85,122 @@ namespace CRUDTests
 
         #region GetAllPersons
 
-        //[Fact]
-        //public void GetAllPersons_EmptyList()
-        //{
-        //    //Act
-        //    List<PersonResponse> person_response_from_get = _personService.GetAllPersons();
+        [Fact]
+        //The GetAllPersons() should return an empty list by default
+        public void GetAllPersons_EmptyList()
+        {
+            //Act
+            List<PersonResponse> person_response_from_get = _personService.GetAllPersons();
 
-        //    //Assert
-        //    Assert.Null(person_response_from_get);
-        //}
+            //Assert
+            Assert.Empty(person_response_from_get);
+        }
+
+
+        [Fact]
+        //First, we will add few persons; and then when we call GetAllPersons(), it should return the same persons that were added
+        public void GetAllPersons_AddFiewPersons()
+        {
+            //Arrange
+            CountryAddRequest country_add_request_1 = new CountryAddRequest() { CountryName = "UK" };
+            CountryAddRequest country_add_request_2 = new CountryAddRequest() { CountryName = "Poland" };
+
+            CountryResponse country_response_1 = _countriesService.AddCountry(country_add_request_1);
+            CountryResponse country_response_2 = _countriesService.AddCountry(country_add_request_2);
+
+            PersonAddRequest person_add_request_1 = new PersonAddRequest()
+            {
+                PersonName = "Person1",
+                Email = "person1@exmample.com",
+                DateOfBirth = DateTime.Parse("2003-03-03"),
+                Gender = GenderOptions.Female,
+                CountryID = country_response_1.CountryID,
+                Address = "addres1",
+                ReceiveNewsLetters = true
+            };
+            PersonAddRequest person_add_request_2 = new PersonAddRequest()
+            {
+                PersonName = "Person2",
+                Email = "person2@exmample.com",
+                DateOfBirth = DateTime.Parse("2003-03-03"),
+                Gender = GenderOptions.Male,
+                CountryID = country_response_2.CountryID,
+                Address = "addres2",
+                ReceiveNewsLetters = false
+            };
+
+            List<PersonAddRequest> person_add_requests = new List<PersonAddRequest>()
+            {
+                person_add_request_1, person_add_request_2
+            };
+
+            List<PersonResponse> person_response_list_from_add = new List<PersonResponse>();
+
+            foreach(PersonAddRequest person_request in person_add_requests)
+            {
+                person_response_list_from_add.Add(_personService.AddPerson(person_request));
+            }
+
+            //Act
+            List<PersonResponse> person_reponse_from_get = _personService.GetAllPersons();
+
+            //Assert
+            foreach(PersonResponse person in person_response_list_from_add)
+            {
+                Assert.Contains(person, person_reponse_from_get);
+            }
+            
+        }
+
+        #endregion
+
+        #region GerPersonByPersonID
+
+        [Fact]
+        //If we supply null as PersonID, it should return null as PersonResponse
+        public void GerPersonByPersonID_NullPersonID()
+        {
+            //Arrange
+            Guid personID = Guid.Empty;
+
+            //Act
+            PersonResponse? person_response_from_get_person_by_id = _personService.GetPersonByPersonID(personID);
+
+            //Assert
+            Assert.Null(person_response_from_get_person_by_id);
+        }
+
+        [Fact]
+        //If we supply a valid person id, it should return a valid person details as PersonResponse object
+        public void GerPersonByPersonID_WithPersonID()
+        {
+            //Arrange
+            CountryAddRequest country_add_request = new CountryAddRequest()
+            {
+                CountryName = "Canada"
+            };
+            CountryResponse country_response_from_get_ = _countriesService.AddCountry(country_add_request);
+
+            PersonAddRequest person_add_request = new PersonAddRequest()
+            {
+                PersonName = "Person",
+                Email = "person@example.com",
+                Address = "addres",
+                DateOfBirth = DateTime.Parse("2001-03-03"),
+                CountryID = country_response_from_get_.CountryID,
+                Gender = GenderOptions.Male,
+                ReceiveNewsLetters = false
+            };
+
+            //Act
+            PersonResponse person_response_from_add = _personService.AddPerson(person_add_request);
+
+            PersonResponse? person_response_from_get = _personService.GetPersonByPersonID(person_response_from_add.PersonID);
+
+            //Assert
+            Assert.Equal(person_response_from_add, person_response_from_get);
+        }
+
 
         #endregion
     }
