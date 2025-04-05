@@ -1,8 +1,10 @@
 ﻿using Entities;
 using ServiceContracts;
 using ServiceContracts.DTO;
+using Services.Helpers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +28,7 @@ namespace Services
         private PersonResponse ConvertPersonToPersonResponse(Person person)
         {
             PersonResponse personResponse = person.ToPersonResponse();
-            personResponse.Country = _countriesService.GetCountryByCountryID(person.CountryID)?.CountryName ;
+            personResponse.Country = _countriesService.GetCountryByCountryID(person.CountryID)?.CountryName;
             return personResponse;
         }
 
@@ -38,11 +40,8 @@ namespace Services
                 throw new ArgumentNullException(nameof(personAddRequest));
             }
 
-            //Validate PersonName
-            if (string.IsNullOrEmpty(personAddRequest.PersonName))
-            {
-                throw new ArgumentException("PersonName can't be blank");
-            }
+            //Model validation
+            ValidationHelper.ModelValidation(personAddRequest);
 
             //convert personAddRequest into Person type
             Person person = personAddRequest.ToPerson();
