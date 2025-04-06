@@ -536,5 +536,49 @@ namespace CRUDTests
         }
 
         #endregion
+
+        #region DeletePerson
+
+        [Fact]
+        //If you supply an invalid PersonID, it should return true
+        public void DeletePerson_InvalidPersonID()
+        {
+            //Act
+            bool isDeleted = _personService.DeletePerson(Guid.NewGuid());
+
+            //Assert
+            Assert.False(isDeleted);
+
+        }
+
+        [Fact]
+        //If you supply a valid PersonID, it should return true
+        public void DeletePerson_ValidPersonID()
+        {
+            //Arrange
+            CountryAddRequest country_add_request = new CountryAddRequest() { CountryName = "Poland" };
+            CountryResponse country_response_from_add = _countriesService.AddCountry(country_add_request);
+
+            PersonAddRequest? personAddRequest = new PersonAddRequest()
+            {
+                PersonName = "Julia",
+                Email = "person@example.com",
+                Address = "sample address",
+                CountryID = country_response_from_add.CountryID,
+                Gender = GenderOptions.Male,
+                DateOfBirth = DateTime.Parse("2000-01-01"),
+                ReceiveNewsLetters = true
+            };
+            PersonResponse person_response_from_add = _personService.AddPerson(personAddRequest);
+
+            //Act
+            bool isDeleted = _personService.DeletePerson(person_response_from_add.PersonID);
+
+            //Assert
+            Assert.True(isDeleted);
+
+        }
+
+        #endregion
     }
 }

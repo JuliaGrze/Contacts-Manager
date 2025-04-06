@@ -210,7 +210,7 @@ namespace Services
             if (matchingPerson == null)
                 throw new ArgumentException("Given person id it doesn't exist");
 
-            //Update all details from PersonUpdateRequest object to PersonObject
+            //Update all details from PersonUpdateRequest object to PersonObject       
             matchingPerson.PersonName = personUpdateRequest.PersonName;
             matchingPerson.Email = personUpdateRequest.Email;
             matchingPerson.DateOfBirth = personUpdateRequest.DateOfBirth;
@@ -220,6 +220,26 @@ namespace Services
             matchingPerson.ReceiveNewsLetters = personUpdateRequest.ReceiveNewsLetters;
 
             return matchingPerson.ToPersonResponse();
+        }
+
+        public bool DeletePerson(Guid? personID)
+        {
+            //check if "personID" is not null
+            if(personID == null) 
+                throw new ArgumentNullException(nameof(personID));
+
+            //Get the matching "Person" object from List<Person> based on PersonID
+            Person? matchingPerson = _persons.FirstOrDefault(temp => temp.PersonID == personID);
+
+            //check if matching Person object is not null
+            if(matchingPerson == null)
+                return false;
+
+            //Delete the matching Person object from List<person>
+            _persons.RemoveAll(temp => temp.PersonID == personID);
+
+            return true;
+
         }
     }
 }
