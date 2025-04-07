@@ -2,7 +2,7 @@
 using Microsoft.VisualBasic;
 using ServiceContracts;
 using ServiceContracts.DTO;
-using ServiceContracts.DTO.Enums;
+using ServiceContracts.Enums;
 using Services.Helpers;
 using System;
 using System.Collections.Generic;

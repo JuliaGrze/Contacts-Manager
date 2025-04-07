@@ -1,7 +1,7 @@
 ﻿using Entities;
 using ServiceContracts;
 using ServiceContracts.DTO;
-using ServiceContracts.DTO.Enums;
+using ServiceContracts.Enums;
 using Services;
 using System;
 using System.Collections.Generic;

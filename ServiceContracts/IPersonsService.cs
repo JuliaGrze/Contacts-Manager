@@ -1,5 +1,5 @@
 ﻿using ServiceContracts.DTO;
-using ServiceContracts.DTO.Enums;
+using ServiceContracts.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
