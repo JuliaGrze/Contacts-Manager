@@ -89,7 +89,50 @@ namespace Services
                         Address = "8 West Parkway",
                         ReceiveNewsLetters = true,
                         CountryID = Guid.Parse("51E77A42-2938-4120-8F03-A78283C097D1")
-                    });
+                    },
+                    new Person() 
+                    { 
+                        PersonID = Guid.Parse("8082ED0C-396D-4162-AD1D-29A13F929824"), 
+                        PersonName = "Aguste", 
+                        Email = "aleddy0@booking.com", 
+                        DateOfBirth = DateTime.Parse("1993-01-02"), 
+                        Gender = "Male", 
+                        Address = "0858 Novick Terrace", 
+                        ReceiveNewsLetters = false, 
+                        CountryID = Guid.Parse("722AEA05-1CBA-46F5-BD98-95FA3A40F298") 
+                    },
+                    new Person() 
+                    { 
+                        PersonID = Guid.Parse("06D15BAD-52F4-498E-B478-ACAD847ABFAA"), 
+                        PersonName = "Jasmina", 
+                        Email = "jsyddie1@miibeian.gov.cn", 
+                        DateOfBirth = DateTime.Parse("1991-06-24"), 
+                        Gender = "Female",
+                        Address = "0742 Fieldstone Lane",
+                        ReceiveNewsLetters = true, 
+                        CountryID = Guid.Parse("51E77A42-2938-4120-8F03-A78283C097D1F") 
+                    },
+                    new Person() 
+                    { 
+                        PersonID = Guid.Parse("D3EA677A-0F5B-41EA-8FEF-EA2FC41900FD"), 
+                        PersonName = "Kendall", Email = "khaquard2@arstechnica.com", 
+                        DateOfBirth = DateTime.Parse("1993-08-13"), 
+                        Gender = "Male", 
+                        Address = "7050 Pawling Alley", 
+                        ReceiveNewsLetters = false, 
+                        CountryID = Guid.Parse("39E5283C-9915-4A9A-8A29-734D4F2CB2A9") 
+                    },
+                    new Person() 
+                    { PersonID = Guid.Parse("89452EDB-BF8C-4283-9BA4-8259FD4A7A76"), 
+                        PersonName = "Kilian", Email = "kaizikowitz3@joomla.org", 
+                        DateOfBirth = DateTime.Parse("1991-06-17"), 
+                        Gender = "Male",
+                        Address = "233 Buhler Junction", 
+                        ReceiveNewsLetters = true, 
+                        CountryID = Guid.Parse("0100D2BE-EFD9-469F-BDC2-73284D19BD6E") 
+                    }
+                    );
+
             }
         }
 
