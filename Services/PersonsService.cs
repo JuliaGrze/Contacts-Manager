@@ -20,10 +20,77 @@ namespace Services
         private readonly ICountriesService _countriesService;
 
         //constructor
-        public PersonsService()
+        public PersonsService(bool initialize = true)
         {
             _persons = new List<Person>();
             _countriesService = new CountriesService();
+
+            if (initialize)
+            {
+                _persons.AddRange(
+                    new Person() { 
+                        PersonID = Guid.Parse("15AC8137-1B42-48A6-84C7-8CBEBF3028D0"),
+                        PersonName = "Jackson",
+                        Email = "jtschierasche0@microsoft.com",
+                        DateOfBirth = DateTime.Parse("21/10/1991"),
+                        Gender = GenderOptions.Male.ToString(),
+                        Address = "31505 Heath Way",
+                        ReceiveNewsLetters = false,
+                        CountryID = Guid.Parse("722AEA05-1CBA-46F5-BD98-95FA3A40F298")
+
+                    },
+                    new Person() { 
+                        PersonID = Guid.Parse("840E0E14-5B0A-4EEE-818A-AE8322BBB27A"),
+                        PersonName = "Winfield",
+                        Email = "wrowles1@woothemes.com",
+                        DateOfBirth = DateTime.Parse("03/05/1990"),
+                        Gender = GenderOptions.Male.ToString(),
+                        Address = "25617 Canary Way",
+                        ReceiveNewsLetters = false,
+                        CountryID = Guid.Parse("51E77A42-2938-4120-8F03-A78283C097D1")
+                    },
+                    new Person() { 
+                        PersonID = Guid.Parse("81811502-C218-4CE4-AB38-2323323215C7"),
+                        PersonName = "Mallory",
+                        Email = "mkeniwell2@e-recht24.de",
+                        DateOfBirth = DateTime.Parse("12/09/1991"),
+                        Gender = GenderOptions.Female.ToString(),
+                        Address = "14 Kipling Road",
+                        ReceiveNewsLetters = true,
+                        CountryID = Guid.Parse("722AEA05-1CBA-46F5-BD98-95FA3A40F298")
+                    },
+                    new Person() { 
+                        PersonID = Guid.Parse("899E6A55-DAB1-45C5-94F6-10C8AF4F7AC1"),
+                        PersonName = "Van",
+                        Email = "vgillbee3@tripod.com",
+                        DateOfBirth = DateTime.Parse("15/03/1996"),
+                        Gender = GenderOptions.Female.ToString(),
+                        Address = "8 Clemons Drive",
+                        ReceiveNewsLetters = false,
+                        CountryID = Guid.Parse("12E7AE0D-E4E5-4BF5-856A-5BBA1D384BBA")
+                    },
+                    new Person() { 
+                        PersonID = Guid.Parse("4237C350-B583-47E6-944E-14108FB6ADAF"),
+                        PersonName = "Ronalda",
+                        Email = "rbellworthy4@msn.com",
+                        DateOfBirth = DateTime.Parse("17/03/1993"),
+                        Gender = GenderOptions.Female.ToString(),
+                        Address = "0591 Darwin Alley",
+                        ReceiveNewsLetters = false,
+                        CountryID = Guid.Parse("0100D2BE-EFD9-469F-BDC2-73284D19BD6E")
+                    },
+                    new Person()
+                    {
+                        PersonID = Guid.Parse("D7844028-ED37-442C-B49C-787794BD7702"),
+                        PersonName = "Michel",
+                        Email = "mwilliamson5@ycombinator.com",
+                        DateOfBirth = DateTime.Parse("28/08/1992"),
+                        Gender = GenderOptions.Female.ToString(),
+                        Address = "8 West Parkway",
+                        ReceiveNewsLetters = true,
+                        CountryID = Guid.Parse("51E77A42-2938-4120-8F03-A78283C097D1")
+                    });
+            }
         }
 
 

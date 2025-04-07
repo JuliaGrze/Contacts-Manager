@@ -22,8 +22,8 @@ namespace CRUDTests
         //constructor
         public PersonsServiceTest(ITestOutputHelper testOutputHelper)
         {
-            _personService = new PersonsService();
-            _countriesService = new CountriesService();
+            _personService = new PersonsService(false);
+            _countriesService = new CountriesService(false);
             _outputHelper = testOutputHelper;
         }
 
