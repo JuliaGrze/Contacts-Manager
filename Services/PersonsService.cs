@@ -110,7 +110,7 @@ namespace Services
                         Gender = "Female",
                         Address = "0742 Fieldstone Lane",
                         ReceiveNewsLetters = true, 
-                        CountryID = Guid.Parse("51E77A42-2938-4120-8F03-A78283C097D1F") 
+                        CountryID = Guid.Parse("51E77A42-2938-4120-8F03-A78283C097D1") 
                     },
                     new Person() 
                     { 
@@ -132,7 +132,6 @@ namespace Services
                         CountryID = Guid.Parse("0100D2BE-EFD9-469F-BDC2-73284D19BD6E") 
                     }
                     );
-
             }
         }
 
@@ -192,21 +191,21 @@ namespace Services
 
             switch (searchBy)
             {
-                case nameof(Person.PersonName):
+                case nameof(PersonResponse.PersonName):
                     matchingPersons = allPersons
                         .Where(person => !string.IsNullOrWhiteSpace(person.PersonName) &&
                          person.PersonName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
                         .ToList();
                     break;
 
-                case nameof(Person.Email):
+                case nameof(PersonResponse.Email):
                     matchingPersons = allPersons
                         .Where(person => !string.IsNullOrEmpty(person.Email) &&
                         person.Email.Contains(searchString, StringComparison.OrdinalIgnoreCase))
                         .ToList();
                     break;
 
-                case nameof(Person.DateOfBirth):
+                case nameof(PersonResponse.DateOfBirth):
                     if (DateTime.TryParse(searchString, out DateTime searchDate))
                     {
                         matchingPersons = allPersons
@@ -215,21 +214,21 @@ namespace Services
                     }
                     break;
 
-                case nameof(Person.Gender):
+                case nameof(PersonResponse.Gender):
                     matchingPersons = allPersons
                         .Where(person => !string.IsNullOrEmpty(person.Gender) &&
-                        person.Gender.StartsWith(searchString, StringComparison.OrdinalIgnoreCase))
+                        person.Gender.Equals(searchString, StringComparison.OrdinalIgnoreCase))
                         .ToList();
                     break;
 
-                case nameof(Person.CountryID):
+                case nameof(PersonResponse.CountryID):
                     matchingPersons = allPersons
                         .Where(person => !string.IsNullOrEmpty(person.Country) &&
                         person.Country.Contains(searchString, StringComparison.OrdinalIgnoreCase))
                         .ToList();
                     break;
 
-                case nameof(Person.Address):
+                case nameof(PersonResponse.Address):
                     matchingPersons = allPersons
                         .Where(person => !string.IsNullOrEmpty(person.Address) &&
                         person.Address.Contains(searchString, StringComparison.OrdinalIgnoreCase))
