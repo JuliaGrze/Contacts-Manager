@@ -5,6 +5,7 @@ using ServiceContracts.Enums;
 
 namespace Contacts_Manager.Controllers
 {
+    [Route("[controller]")]
     public class PersonsController : Controller
     {
         //private fields
@@ -20,7 +21,7 @@ namespace Contacts_Manager.Controllers
 
         //person list
 
-        [Route("persons/index")]
+        [Route("[action]")]
         [Route("/")]
         public IActionResult Index(string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName), SortOrderEnum sortOrder = SortOrderEnum.ASC )
         {
@@ -54,7 +55,7 @@ namespace Contacts_Manager.Controllers
         }
 
         //Executes when th euser clicks on "Create Person" hyperlink 
-        [Route("persons/create")]
+        [Route("create")]
         [HttpGet]
         public IActionResult Create()
         {
@@ -64,7 +65,7 @@ namespace Contacts_Manager.Controllers
         }
 
         [HttpPost]
-        [Route("persons/create")]
+        [Route("[action]")]
         public IActionResult Create(PersonAddRequest personAddRequest)
         {
             //check if person details is valid
