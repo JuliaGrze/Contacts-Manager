@@ -1,40 +1,45 @@
-﻿@{ 
+﻿@model PersonAddRequest
+@{ 
     ViewBag.Title = "Create Person";
 }
 
-<a href="~/persons/index" class="link-hover">Back to Persons list</a>
+<a asp-controller="Persons" asp-action="Index" class="link-hover">Back to Persons list</a>
 <h2>Create Person</h2>
 
 <div class="w-50">
-    <form action="~/persons/create" method="post">
+    <form asp-controller="Persons" asp-action="Create" method="post">
         @*Person Name*@
         <div class="form-field flex">
             @*atrybuty for i id współpracują ze sobą, żeby połączyć etykietę (<label>) z odpowiednim polem formularza (<input>)*@
             <div class="w-25">
-                <label for="PersonName" class="form-label pt">Person Name</label>
+                @*<label for="PersonName" class="form-label pt">Person Name</label>*@
+                <label asp-for="PersonName" class="form-label pt">Person Name</label>
             </div>
             <div class="flex-1">
-                <input type="text" class="form-input" id="PersonName" name="PersonName" /> @*name musi byc takie same jak w kalsie PersonAddRequest*@
+                @*<input type="text" class="form-input" id="PersonName" name="PersonName" /> name musi byc takie same jak w kalsie PersonAddRequest*@
+                <input asp-for="PersonName" class="form-input" />
             </div>
         </div>
 
         @*Email*@
         <div class="form-field flex">
             <div class="w-25">
-                <label for="Email" class="form-label">Email</label>
+                <label asp-for="Email" class="form-label">Email</label>
             </div>
             <div class="flex-1">
-                <input type="email" class="form-input" id="Email" name="Email" />
+                @*<input type="email" class="form-input" id="Email" name="Email" />*@
+                <input asp-for="Email" class="form-input" />
             </div>
         </div>
 
         @*Date of Birth*@
         <div class="form-field flex">
             <div class="w-25">
-                <label for="DateOfBirth" class="form-label">Date of Birth</label>
+                <label asp-for="DateOfBirth" class="form-label">Date of Birth</label>
             </div>
             <div class="flex-1">
-                <input type="date" class="form-input" id="DateOfBirth" name="DateOfBirth" />
+                @*<input type="date" class="form-input" id="DateOfBirth" name="DateOfBirth" />*@
+                <input asp-for="DateOfBirth" class="form-input" />
             </div>
         </div>
 
@@ -44,29 +49,35 @@
                 <label class="form-label">Gender</label>
             </div>
             <div class="flex-1">
-                <input type="radio" id="Male" name="Gender" value="Male" />
-                <label for="Male">Male</label>
+                @*<input type="radio" id="Male" name="Gender" value="Male" />*@
+                @*<label for="Male">Male</label>*@
+                @{
+                    string[] genders = (string[])Enum.GetNames(typeof(GenderOptions));
+                }
 
-                <input type="radio" id="Female" name="Gender" value="Female" class="ml" />
-                <label for="Female">Female</label>
-
-                <input type="radio" id="Other" name="Gender" value="Other" class="ml" />
-                <label for="Other">Other</label>
+                @foreach (string gender in genders)
+                {
+                    <input type="radio" asp-for="Gender" value="@gender" />
+                    <label for="@gender">@gender</label>
+                }
             </div>
         </div>
 
         @*Country*@
         <div class="form-field flex">
             <div class="w-25">
-                <label for="CountryID" class="form-label">Country</label>
+                <label asp-for="CountryID" class="form-label">Country</label>
             </div>
             <div class="flex-1">
-                <select name="CountryID" id="CountryID" class="form-input">
+                @*<select asp-for="CountryID" class="form-input">
                     <option value="">Please Select</option>
                     @foreach (CountryResponse country in ViewBag.Countries)
                     {
                         <option value="@country.CountryID">@country.CountryName</option>
                     }
+                </select>*@
+                <select asp-for="CountryID" class="form-input" asp-items="@ViewBag.Countries">
+                    <option value="">Please Select</option>
                 </select>
             </div>
         </div>
@@ -74,10 +85,11 @@
         @*Address*@
         <div class="form-field flex">
             <div class="w-25">
-                <label for="Address" class="form-label">Address</label>
+                <label asp-for="Address" class="form-label">Address</label>
             </div>
             <div class="flex-1">
-                <textarea id="Address" name="Address" class="form-input"></textarea>
+                @*<textarea id="Address" name="Address" class="form-input"></textarea>*@
+                <textarea asp-for="Address" class="form-input"></textarea>
             </div>
         </div>
 
@@ -86,8 +98,10 @@
             <div class="w-25">
             </div>
             <div class="flex-1">
-                <input type="checkbox" id="ReceiveNewsLetters" name="ReceiveNewsLetters" value="true" />
-                <label for="ReceiveNewsLetters" class="form-label">Receive News Letters</label>
+                @*<input type="checkbox" id="ReceiveNewsLetters" name="ReceiveNewsLetters" value="true" />*@
+                <input asp-for="ReceiveNewsLetters" value="true" />
+                <label asp-for="ReceiveNewsLetters" class="form-label">Receive News Letters</label>
+                <span asp-validation-for="ReceiveNewsLetters" class="text-red"></span>
             </div>
         </div>
 
@@ -98,7 +112,7 @@
             <div class="flex-1">
                 <button class="button button-green-back">Create</button>
 
-                @if(ViewBag.Errors != null)
+                @if (ViewBag.Errors != null)
                 {
                     <div class="text-red ml">
                         <ul>

@@ -4,11 +4,11 @@
 }
 
 <!--Aby formularz zebrał wartości z formularza z konkretnego elementu to ten element musi miec name="..."-->
-<form action="~/persons/index" method="get">
+<form asp-controller="Persons" asp-action="Index" method="get">
     <h1>Persons</h1>
 
     <!--CreateView-->
-    <a href="~/persons/create" class="link-hover">Create Person</a>
+    <a asp-controller="Persons" asp-action="Create" class="link-hover">Create Person</a>
 
     <!--Search-->
     <div class="box flex">
@@ -33,7 +33,7 @@
 
         <div class="flex-1">
             <button class="button button-blue-back">Search</button>
-            <a href="~/persons/index" class="link-hover">Clear all</a>
+            <a asp-controller="Persons" asp-action="Index" class="link-hover">Clear all</a>
         </div>
     </div>
 

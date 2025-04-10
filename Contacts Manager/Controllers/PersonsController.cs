@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using ServiceContracts;
 using ServiceContracts.DTO;
 using ServiceContracts.Enums;
@@ -23,7 +24,7 @@ namespace Contacts_Manager.Controllers
 
         [Route("[action]")]
         [Route("/")]
-        public IActionResult Index(string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName), SortOrderEnum sortOrder = SortOrderEnum.ASC )
+        public IActionResult Index(string searchBy, string? searchString, string sortBy = nameof(PersonResponse.PersonName), SortOrderEnum sortOrder = SortOrderEnum.ASC)
         {
             //Search
             //Actual Name - Display name - 
@@ -32,7 +33,7 @@ namespace Contacts_Manager.Controllers
                 {nameof(PersonResponse.PersonName), "Person Name" },
                 {nameof(PersonResponse.Email), "Email" },
                 {nameof(PersonResponse.DateOfBirth), "Date of Birth" },
-               
+
                 {nameof(PersonResponse.Gender), "Gender" },
                 {nameof(PersonResponse.CountryID), "Country" },
                 {nameof(PersonResponse.Address), "Address" }
@@ -40,8 +41,8 @@ namespace Contacts_Manager.Controllers
             Console.WriteLine("fgh");
             //Search
             List<PersonResponse> persons = _personsService.GetFilteredPersons(searchBy, searchString);
-            
-            
+
+
             //Save search fields after searching
             ViewBag.CurrentSearchBy = searchBy;
             ViewBag.CurrentSearchString = searchString;
@@ -60,7 +61,10 @@ namespace Contacts_Manager.Controllers
         public IActionResult Create()
         {
             List<CountryResponse> countries = _countriesService.GetAllCountries();
-            ViewBag.Countries = countries;
+            //ViewBag.Countries = countries;
+            ViewBag.Countries = countries.Select(temp =>
+                new SelectListItem() { Text = temp.CountryName, Value = temp.CountryID.ToString() });
+
             return View();
         }
 
