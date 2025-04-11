@@ -91,5 +91,48 @@ namespace Contacts_Manager.Controllers
             //navigate to Index() action method (it makes another get request to "persons/index")
             return RedirectToAction("Index");
         }
+
+        //Edit person details
+        [HttpGet]
+        [Route("[action]/{personID}")] //Eg: /persons/edit/1
+        public IActionResult Edit(Guid personID)
+        {
+            PersonResponse personResponse = _personsService.GetPersonByPersonID(personID);
+            if(personResponse == null) 
+                return RedirectToAction("Index");
+
+            List<CountryResponse> countries = _countriesService.GetAllCountries();
+            ViewBag.Countries = countries.Select(temp =>
+                new SelectListItem() { Text = temp.CountryName, Value = temp.CountryID.ToString() });
+
+            PersonUpdateRequest personUpdateRequest = personResponse.ToPersonUpdateRequest();
+            return View(personUpdateRequest);
+        }
+
+        [HttpPost]
+        [Route("[action]/{personID}")]
+        public IActionResult Edit(PersonUpdateRequest personUpdateRequest)
+        {
+            PersonResponse? personResponse = _personsService.GetPersonByPersonID(personUpdateRequest.PersonID);
+
+            if(personResponse == null )
+                return RedirectToAction("Index");
+
+            //if personResponse is not null and valid
+            if (ModelState.IsValid)
+            {
+               PersonResponse updayedPerson = _personsService.UpdatePerson(personUpdateRequest);
+                return RedirectToAction("Index");
+            }
+
+            //if is not valid
+            ViewBag.Errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+            return View();
+
+        }
     }
 }

@@ -71,7 +71,7 @@ namespace ServiceContracts.DTO
                     : null,
                 CountryID = CountryID,
                 Address = Address,
-                ReceiveNewsLetters = ReceiveNewsLetters
+                ReceiveNewsLetters = ReceiveNewsLetters ?? false
             };
         }
     }

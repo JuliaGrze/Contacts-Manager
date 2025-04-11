@@ -1,13 +1,16 @@
-﻿@model PersonAddRequest
+﻿@model PersonUpdateRequest
 @{ 
-    ViewBag.Title = "Create Person";
+    ViewBag.Title = "Edit Person";
 }
 
 <a asp-controller="Persons" asp-action="Index" class="link-hover">Back to Persons list</a>
-<h2>Create Person</h2>
+<h2>Edit Person</h2>
 
 <div class="w-75 center-box">
-    <form asp-controller="Persons" asp-action="Create" method="post">
+    <form asp-controller="Persons" asp-action="Edit" method="post">
+
+        <input type="hidden" asp-for="PersonID" />
+
         @*Person Name*@
         <div class="form-field flex">
             @*atrybuty for i id współpracują ze sobą, żeby połączyć etykietę (<label>) z odpowiednim polem formularza (<input>)*@
@@ -41,7 +44,7 @@
             </div>
             <div class="flex-1">
                 @*<input type="date" class="form-input" id="DateOfBirth" name="DateOfBirth" />*@
-                <input asp-for="DateOfBirth" class="form-input" />
+                <input type="date" asp-for="DateOfBirth" class="form-input" />
                 <span asp-validation-for="DateOfBirth" class="text-red"></span>
             </div>
         </div>
@@ -105,7 +108,7 @@
             </div>
             <div class="flex-1">
                 @*<input type="checkbox" id="ReceiveNewsLetters" name="ReceiveNewsLetters" value="true" />*@
-                <input type="checkbox" asp-for="ReceiveNewsLetters" value="true"/>
+                <input type="checkbox" asp-for="ReceiveNewsLetters" value="true" />
                 <label asp-for="ReceiveNewsLetters" class="form-label">Receive News Letters</label>
                 <span asp-validation-for="ReceiveNewsLetters" class="text-red"></span>
             </div>
@@ -116,7 +119,7 @@
             <div class="w-25">
             </div>
             <div class="flex-1">
-                <button class="button button-green-back">Create</button>
+                <button class="button button-green-back">Update</button>
 
                 <div asp-validation-summary="All" class="text-red">
                     @if (ViewBag.Errors != null)
