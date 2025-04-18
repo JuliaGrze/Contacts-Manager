@@ -27,7 +27,6 @@ namespace Services
 
         }
 
-
         private PersonResponse ConvertPersonToPersonResponse(Person person)
         {
             PersonResponse personResponse = person.ToPersonResponse();
@@ -60,11 +59,12 @@ namespace Services
             return ConvertPersonToPersonResponse(person);
         }
 
-        public List<PersonResponse> GetAllPersons()
-        {
-            //Select * fromn Persons
-            return _db.Persons.ToList().Select(person => ConvertPersonToPersonResponse(person)).ToList();
-        }
+            public List<PersonResponse> GetAllPersons()
+            {
+                //Select * fromn Persons
+                //return _db.Persons.ToList().Select(person => ConvertPersonToPersonResponse(person)).ToList();
+                return _db.sp_GetAllPersons().Select(person => ConvertPersonToPersonResponse(person)).ToList();
+            }
 
         public PersonResponse? GetPersonByPersonID(Guid? personID)
         {

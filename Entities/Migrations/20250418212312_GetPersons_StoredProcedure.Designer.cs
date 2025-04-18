@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entities.Migrations
 {
     [DbContext(typeof(PersonsDbContext))]
-    [Migration("20250418074537_GetPersons_StoredProcedure")]
+    [Migration("20250418212312_GetPersons_StoredProcedure")]
     partial class GetPersons_StoredProcedure
     {
         /// <inheritdoc />
