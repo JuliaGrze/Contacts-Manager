@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,9 +44,27 @@ namespace Entities
             }
         }
 
+        //EF Stored Procedure - zwraca wszytskich persons
         public List<Person> sp_GetAllPersons()
         {
             return Persons.FromSqlRaw("EXECUTE [dbo].[GetAllPersons]").ToList();
+        }
+
+        //EF Stored Procedure with Paremtrs - dodanie nowego person
+        public int sp_InsertPerson(Person person)
+        {
+            SqlParameter[] parameters = new SqlParameter[] {
+                new SqlParameter("@PersonID", person.PersonID),
+                new SqlParameter("@PersonName", (object?)person.PersonName ?? DBNull.Value),
+                new SqlParameter("@Email", (object?)person.Email ?? DBNull.Value),
+                new SqlParameter("@DateOfBirth", (object?)person.DateOfBirth ?? DBNull.Value),
+                new SqlParameter("@Gender", (object?)person.Gender ?? DBNull.Value),
+                new SqlParameter("@CountryID", (object?)person.CountryID ?? DBNull.Value),
+                new SqlParameter("@Address", (object?)person.Address ?? DBNull.Value),
+                new SqlParameter("@ReceiveNewsLetters", (object?)person.ReceiveNewsLetters ?? DBNull.Value)
+            };
+
+            return Database.ExecuteSqlRaw("EXEC [dbo].[InsertPerson]@PersonID, @PersonName, @Email, @DateOfBirth, @Gender, @CountryID, @Address, @ReceiveNewsLetters", parameters);
         }
     }
 }
