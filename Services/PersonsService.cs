@@ -246,8 +246,9 @@ namespace Services
                 return false;
 
             //Delete the matching Person object from List<person>
-            _db.Persons.Remove(_db.Persons.First(temp => temp.PersonID == personID));
-            _db.SaveChanges(); //DELETE
+            //_db.Persons.Remove(_db.Persons.First(temp => temp.PersonID == personID));
+            //_db.SaveChanges(); //DELETE
+            _db.sp_DeletePerson(personID.Value);
 
             return true;
 

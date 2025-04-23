@@ -66,5 +66,15 @@ namespace Entities
 
             return Database.ExecuteSqlRaw("EXEC [dbo].[InsertPerson]@PersonID, @PersonName, @Email, @DateOfBirth, @Gender, @CountryID, @Address, @ReceiveNewsLetters", parameters);
         }
+
+        //EF Stored Procedure with Paremtrs - Usuniecie person
+        public int sp_DeletePerson(Guid personID)
+        {
+            SqlParameter[] parameters = new SqlParameter[] {
+                new SqlParameter("@PersonID", personID)
+            };
+
+            return Database.ExecuteSqlRaw("EXEC [dbo].[DeletePerson] @PersonID", parameters);
+        }
     }
 }
