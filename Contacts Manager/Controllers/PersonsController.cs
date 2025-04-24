@@ -162,6 +162,7 @@ namespace Contacts_Manager.Controllers
             return RedirectToAction("Index");
         }
 
+        //Generate PDF people list
         [Route("[action]")]
         public async Task<IActionResult> PersonsPDF()
         {
@@ -173,6 +174,15 @@ namespace Contacts_Manager.Controllers
                 PageMargins = new Rotativa.AspNetCore.Options.Margins() { Top = 20, Bottom = 20, Left = 20, Right = 20 },
                 PageOrientation  = Rotativa.AspNetCore.Options.Orientation.Landscape
             };
+        }
+
+        //generate csv - people
+        [Route("[action]")]
+        public async Task<IActionResult> PersonsCSV()
+        {
+            MemoryStream memoryStream = await _personsService.GetPersonCSV();
+
+            return File(memoryStream, "application/octet-stream", "persons.csv");
         }
     }
 }

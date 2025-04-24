@@ -1,4 +1,6 @@
-﻿using Entities;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using ServiceContracts;
@@ -8,6 +10,7 @@ using Services.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -247,6 +250,55 @@ namespace Services
 
             return true;
 
+        }
+
+        //MemoryStream to klasa w .NET, która umożliwia zapisywanie danych do pamięci operacyjnej (RAM) zamiast do pliku na dysku.
+        //Chcesz wygenerować dane dynamicznie (np. CSV, PDF, obraz) i wysłać je użytkownikowi bez zapisywania ich na dysku.
+        public async Task<MemoryStream> GetPersonCSV()
+        {
+            ////tworzysz pusty strumień danych w pamięci RAM. To będzie tymczasowy „plik”, który nie istnieje na dysku.
+            MemoryStream memoryStream = new MemoryStream(); 
+
+            // Tworzysz obiekt StreamWriter, który umożliwia zapis tekstu (czyli znaków) do MemoryStream. Inaczej mówiąc – dzięki temu możesz pisać do strumienia jak do pliku tekstowego.
+            StreamWriter writer = new StreamWriter(memoryStream);
+
+            CsvConfiguration csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture);
+
+            CsvWriter csvWriter = new CsvWriter(writer, csvConfiguration);
+
+            //PersonName, Emial, DateOfBirth, Age, Gender, Country, Address, ReceiveNewsLetters
+            csvWriter.WriteField(nameof(PersonResponse.PersonName));
+            csvWriter.WriteField(nameof(PersonResponse.Email));
+            csvWriter.WriteField(nameof(PersonResponse.DateOfBirth));
+            csvWriter.WriteField(nameof(PersonResponse.Age));
+            csvWriter.WriteField(nameof(PersonResponse.Gender));
+            csvWriter.WriteField(nameof(PersonResponse.Country));
+            csvWriter.WriteField(nameof(PersonResponse.Address));
+            csvWriter.WriteField(nameof(PersonResponse.ReceiveNewsLetters));
+            csvWriter.NextRecord();
+
+            List<PersonResponse> people = _db.Persons.Include(p => p.Country).Select(p => p.ToPersonResponse()).ToList();
+
+            foreach (PersonResponse person in people)
+            {
+                csvWriter.WriteField(person.PersonName);
+                csvWriter.WriteField(person.Email);
+                if (person.DateOfBirth.HasValue)
+                    csvWriter.WriteField(person.DateOfBirth?.ToString("d"));
+                else
+                    csvWriter.WriteField("");
+                csvWriter.WriteField(person.Age);
+                csvWriter.WriteField(person.Gender);
+                csvWriter.WriteField(person.Country);
+                csvWriter.WriteField(person.Address);
+                csvWriter.WriteField(person.ReceiveNewsLetters);
+                csvWriter.NextRecord();
+            }
+
+            // Resetuje pozycję, by móc czytać od początku
+            memoryStream.Position = 0;
+
+            return memoryStream;    // Zwracasz gotowy CSV jako strumień
         }
     }
 }
