@@ -28,7 +28,7 @@ namespace Services
 
         }     
 
-        public PersonResponse AddPerson(PersonAddRequest? personAddRequest)
+        public async Task<PersonResponse> AddPerson(PersonAddRequest? personAddRequest)
         {
             //check if PersonAddRequest is not null
             if (personAddRequest == null)
@@ -47,36 +47,37 @@ namespace Services
 
             //add person object to persons list
             _db.Persons.Add(person);
-            _db.SaveChanges(); //executte insert into database
+            await _db.SaveChangesAsync(); //executte insert into database
             //_db.sp_InsertPerson(person);
 
             //convert the Person object into PersonResponse type
             return person.ToPersonResponse();
         }
 
-        public List<PersonResponse> GetAllPersons()
+        public async Task<List<PersonResponse>> GetAllPersons()
         {
             //Select * fromn Persons
-            return _db.Persons.Include(p => p.Country).ToList().Select(person => person.ToPersonResponse()).ToList();
+            var persons = await _db.Persons.Include(p => p.Country).ToListAsync();
+            return persons.Select(person => person.ToPersonResponse()).ToList();
             //return _db.sp_GetAllPersons().Select(person => ConvertPersonToPersonResponse(person)).ToList();
         }
 
-        public PersonResponse? GetPersonByPersonID(Guid? personID)
+        public async Task<PersonResponse?> GetPersonByPersonID(Guid? personID)
         {
             //check if personID is null
             if (personID == null)
                 return null;
 
-            Person person = _db.Persons.Include(p => p.Country).FirstOrDefault(person => person.PersonID == personID);
+            Person person = await _db.Persons.Include(p => p.Country).FirstOrDefaultAsync(person => person.PersonID == personID);
             if (person == null)
                 return null;
 
             return person.ToPersonResponse();
         }
 
-        public List<PersonResponse> GetFilteredPersons(string searchBy, string? searchString)
+        public async Task<List<PersonResponse>> GetFilteredPersons(string searchBy, string? searchString)
         {
-            List<PersonResponse> allPersons = GetAllPersons();
+            List<PersonResponse> allPersons = await GetAllPersons();
             List<PersonResponse> matchingPersons = allPersons;
 
             if (string.IsNullOrWhiteSpace(searchBy) || string.IsNullOrWhiteSpace(searchString))
@@ -136,7 +137,7 @@ namespace Services
             return matchingPersons;
         }
 
-        public List<PersonResponse> GetSortedPersons(List<PersonResponse> allPersons, string sortBy, SortOrderEnum sortOrder)
+        public async Task<List<PersonResponse>> GetSortedPersons(List<PersonResponse> allPersons, string sortBy, SortOrderEnum sortOrder)
         {
             if (sortBy == null || sortOrder == null)
                 return allPersons;
@@ -196,7 +197,7 @@ namespace Services
             return sortedPersons;
         }
 
-        public PersonResponse UpdatePerson(PersonUpdateRequest? personUpdateRequest)
+        public async Task<PersonResponse> UpdatePerson(PersonUpdateRequest? personUpdateRequest)
         {
             //check if personUpdateRequest is not null
             if (personUpdateRequest == null)
@@ -206,7 +207,7 @@ namespace Services
             ValidationHelper.ModelValidation(personUpdateRequest);
 
             //Get the match Person object fromList<person> based on PersonID to update
-            Person? matchingPerson = _db.Persons.FirstOrDefault(temp => temp.PersonID == personUpdateRequest.PersonID);
+            Person? matchingPerson = await _db.Persons.FirstOrDefaultAsync(temp => temp.PersonID == personUpdateRequest.PersonID);
 
             //check if matching Person is null
             if (matchingPerson == null)
@@ -221,19 +222,19 @@ namespace Services
             matchingPerson.Address = personUpdateRequest.Address;
             matchingPerson.ReceiveNewsLetters = personUpdateRequest.ReceiveNewsLetters;
 
-            _db.SaveChanges(); //exexcute Update in Database
+            await _db.SaveChangesAsync(); //exexcute Update in Database
 
             return matchingPerson.ToPersonResponse();
         }
 
-        public bool DeletePerson(Guid? personID)
+        public async Task<bool> DeletePerson(Guid? personID)
         {
             //check if "personID" is not null
             if(personID == null) 
                 throw new ArgumentNullException(nameof(personID));
 
             //Get the matching "Person" object from List<Person> based on PersonID
-            Person? matchingPerson = _db.Persons.FirstOrDefault(temp => temp.PersonID == personID);
+            Person? matchingPerson = await _db.Persons.FirstOrDefaultAsync(temp => temp.PersonID == personID);
 
             //check if matching Person object is not null
             if(matchingPerson == null)
@@ -241,7 +242,7 @@ namespace Services
 
             //Delete the matching Person object from List<person>
             _db.Persons.Remove(_db.Persons.First(temp => temp.PersonID == personID));
-            _db.SaveChanges(); //DELETE
+            await _db.SaveChangesAsync(); //DELETE
             //_db.sp_DeletePerson(personID.Value);
 
             return true;
