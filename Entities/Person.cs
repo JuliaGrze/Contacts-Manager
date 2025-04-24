@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,5 +33,9 @@ namespace Entities
         //bit
         public bool? ReceiveNewsLetters { get; set; }
         public string? TIN {  get; set; }
+
+        //relation to Country table
+        [ForeignKey("CountryID")]
+        public Country? Country { get; set; }
     }
 }
