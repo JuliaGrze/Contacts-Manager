@@ -24,6 +24,9 @@ if (builder.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
+//PDF
+Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", wkhtmltopdfRelativePath: "Rotativa");
+
 app.UseStaticFiles();
 app.UseRouting(); //W³¹cza system trasowania (routing middleware)
 app.MapControllers();
