@@ -3,6 +3,7 @@ using CsvHelper.Configuration;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
+using OfficeOpenXml;
 using ServiceContracts;
 using ServiceContracts.DTO;
 using ServiceContracts.Enums;
@@ -299,6 +300,51 @@ namespace Services
             memoryStream.Position = 0;
 
             return memoryStream;    // Zwracasz gotowy CSV jako strumień
+        }
+
+        public async Task<MemoryStream> GetPersonsExcel()
+        {
+            MemoryStream memoryStream = new MemoryStream();
+
+            List<PersonResponse> people = _db.Persons.Include(p => p.Country).Select(people => people.ToPersonResponse()).ToList();
+
+            //tworzy nowy pakiet Excela w pamięci – to jakbyś tworzył nowy plik .xlsx, ale jeszcze bez zapisania go fizycznie.
+            using (ExcelPackage excelPackage = new ExcelPackage(memoryStream))
+            {
+                //dodaje nowy arkusz (ang. worksheet) o nazwie "PersonsSheet" do tego zeszytu
+                ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add("PersonsSheet");
+
+                //naglowki
+                worksheet.Cells["A1"].Value = "Person Name";
+                worksheet.Cells["B1"].Value = "Email";
+                worksheet.Cells["C1"].Value = "Date Of Birth";
+                worksheet.Cells["D1"].Value = "Age";
+                worksheet.Cells["E1"].Value = "Gender";
+                worksheet.Cells["F1"].Value = "Country";
+                worksheet.Cells["G1"].Value = "Address";
+                worksheet.Cells["H1"].Value = "Receive News Letters";
+
+                //dane
+                int row = 2;
+                foreach(PersonResponse person in people)
+                {
+                    worksheet.Cells[row, 1].Value = person.PersonName;
+                    worksheet.Cells[row, 2].Value = person.Email;
+                    worksheet.Cells[row, 3].Value = person.DateOfBirth?.ToString("yyyy-MM-dd");
+                    worksheet.Cells[row, 4].Value = person.Age;
+                    worksheet.Cells[row, 5].Value = person.Gender;
+                    worksheet.Cells[row, 6].Value = person.Country;
+                    worksheet.Cells[row, 7].Value = person.Address;
+                    worksheet.Cells[row, 8].Value = person.ReceiveNewsLetters;
+                    row++;
+                }
+
+                worksheet.Cells[$"A1:H{row}"].AutoFitColumns(); //automatyczne dostowanie szerowkosci kolumn
+                await excelPackage.SaveAsync(); // <--- async zapisywanie
+            }
+
+            memoryStream.Position = 0;
+            return memoryStream;
         }
     }
 }

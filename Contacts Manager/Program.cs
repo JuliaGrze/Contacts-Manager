@@ -1,7 +1,9 @@
 using Entities;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using ServiceContracts;
 using Services;
+using System.ComponentModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,10 @@ if (builder.Environment.IsDevelopment())
 
 //PDF
 Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", wkhtmltopdfRelativePath: "Rotativa");
+
+//Excel
+ExcelPackage.License.SetNonCommercialPersonal("Julia");
+
 
 app.UseStaticFiles();
 app.UseRouting(); //W³¹cza system trasowania (routing middleware)
