@@ -1,5 +1,7 @@
 ﻿using Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using ServiceContracts;
 using ServiceContracts.DTO;
 
@@ -56,5 +58,51 @@ namespace Services
             return country?.ToCountryResponse();
         }
 
+        public async Task<int> UploadCountriesFromExcelFile(IFormFile formFile)
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            //Zamienia plik z formularza (formFile) na MemoryStream, żeby móc go odczytać w pamięci.
+            await formFile.CopyToAsync(memoryStream);
+
+            int countriesInserted = 0;
+
+            // Tworzy obiekt ExcelPackage (czyli reprezentację pliku Excel) na podstawie wczytanego strumienia.
+            using (ExcelPackage excelPackage = new ExcelPackage(memoryStream))
+            {
+                // Wybiera arkusz o nazwie Countries.
+                ExcelWorksheet excelWorksheet = excelPackage.Workbook.Worksheets["Countries"];
+                if (excelWorksheet == null)
+                    throw new Exception("Worksheet 'Countries' not found in Excel file.");
+
+                //Liczy, ile jest wierszy w arkuszu (czyli ile krajów próbujesz dodać).
+                int rowCount = excelWorksheet.Dimension.Rows;
+                
+
+                for(int i = 2; i <= rowCount; i++)
+                {
+                    //odczytywanie i wiersza
+                    string? cellValue = Convert.ToString(excelWorksheet.Cells[i, 1].Value);
+
+                    if (!string.IsNullOrEmpty(cellValue)) {
+                        string? countryName = cellValue;
+
+                        // Sprawdza, czy dany kraj już istnieje w bazie.
+                        if (_db.Countries.Where(temp => temp.CountryName == countryName).Count() == 0)
+                        {
+                            Country country = new Country()
+                            {
+                                CountryName = countryName,
+                            };
+
+                            _db.Countries.Add(country);
+                            await _db.SaveChangesAsync();
+                            countriesInserted++;
+                        }
+                    }
+                }               
+            }
+
+            return countriesInserted;
+        }
     }
 }

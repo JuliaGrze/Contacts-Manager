@@ -324,6 +324,13 @@ namespace Services
                 worksheet.Cells["G1"].Value = "Address";
                 worksheet.Cells["H1"].Value = "Receive News Letters";
 
+                using(ExcelRange headerCells = worksheet.Cells["A1:H1"])
+                {
+                    headerCells.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    headerCells.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightBlue);
+                    headerCells.Style.Font.Bold = true;
+                }
+
                 //dane
                 int row = 2;
                 foreach(PersonResponse person in people)
