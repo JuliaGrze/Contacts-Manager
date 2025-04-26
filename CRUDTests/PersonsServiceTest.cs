@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
 using AutoFixture;
+using AutoFixture.Kernel;
 
 namespace CRUDTests
 {
@@ -71,7 +72,9 @@ namespace CRUDTests
         public async Task AddPerson_PeersonNameIsNull()
         {
             //Arrange
-            PersonAddRequest? personAddRequest = new PersonAddRequest() { PersonName = null};
+            PersonAddRequest? personAddRequest = _fixture.Build<PersonAddRequest>()
+                .With(prop => prop.PersonName, null as string)
+                .Create();
 
             //Assert
             await Assert.ThrowsAsync<ArgumentException>(async () =>
@@ -86,15 +89,9 @@ namespace CRUDTests
         public async Task AddPerson_Proper()
         {
             //Arrange
-            PersonAddRequest? personAddRequest = new PersonAddRequest() { 
-                PersonName = "Julia",
-                Email = "person@example.com",
-                Address = "sample address",
-                CountryID = Guid.NewGuid(),
-                Gender = GenderOptions.Male,
-                DateOfBirth = DateTime.Parse("2000-01-01"),
-                ReceiveNewsLetters = true
-            };
+            PersonAddRequest? personAddRequest = _fixture.Build<PersonAddRequest>()
+                .With(temp => temp.Email, "someemail@example.com")
+                .Create();
 
             //Act
             PersonResponse person_response_from_add = await _personService.AddPerson(personAddRequest);
@@ -128,32 +125,19 @@ namespace CRUDTests
         public async Task GetAllPersons_AddFiewPersons()
         {
             //Arrange
-            CountryAddRequest country_add_request_1 = new CountryAddRequest() { CountryName = "UK" };
-            CountryAddRequest country_add_request_2 = new CountryAddRequest() { CountryName = "Poland" };
+            CountryAddRequest country_add_request_1 = _fixture.Create<CountryAddRequest>();
+            CountryAddRequest country_add_request_2 = _fixture.Create<CountryAddRequest>();
 
             CountryResponse country_response_1 = await _countriesService.AddCountry(country_add_request_1);
             CountryResponse country_response_2 = await _countriesService.AddCountry(country_add_request_2);
 
-            PersonAddRequest person_add_request_1 = new PersonAddRequest()
-            {
-                PersonName = "Person1",
-                Email = "person1@exmample.com",
-                DateOfBirth = DateTime.Parse("2003-03-03"),
-                Gender = GenderOptions.Female,
-                CountryID = country_response_1.CountryID,
-                Address = "addres1",
-                ReceiveNewsLetters = true
-            };
-            PersonAddRequest person_add_request_2 = new PersonAddRequest()
-            {
-                PersonName = "Person2",
-                Email = "person2@exmample.com",
-                DateOfBirth = DateTime.Parse("2003-03-03"),
-                Gender = GenderOptions.Male,
-                CountryID = country_response_2.CountryID,
-                Address = "addres2",
-                ReceiveNewsLetters = false
-            };
+            PersonAddRequest person_add_request_1 = _fixture.Build<PersonAddRequest>()
+                .With(temp => temp.Email, "person1@exmample.com")
+                .Create();
+            
+            PersonAddRequest person_add_request_2 = _fixture.Build<PersonAddRequest>()
+                .With(temp => temp.Email, "person2@exmample.com")
+                .Create();
 
             List<PersonAddRequest> person_add_requests = new List<PersonAddRequest>()
             {
@@ -215,22 +199,13 @@ namespace CRUDTests
         public async Task GerPersonByPersonID_WithPersonID()
         {
             //Arrange
-            CountryAddRequest country_add_request = new CountryAddRequest()
-            {
-                CountryName = "Canada"
-            };
+            CountryAddRequest country_add_request = _fixture.Create<CountryAddRequest>();
+
             CountryResponse country_response_from_get_ = await _countriesService.AddCountry(country_add_request);
 
-            PersonAddRequest person_add_request = new PersonAddRequest()
-            {
-                PersonName = "Person",
-                Email = "person@example.com",
-                Address = "addres",
-                DateOfBirth = DateTime.Parse("2001-03-03"),
-                CountryID = country_response_from_get_.CountryID,
-                Gender = GenderOptions.Male,
-                ReceiveNewsLetters = false
-            };
+            PersonAddRequest person_add_request = _fixture.Build<PersonAddRequest>()
+                .With(temp => temp.Email, "email@sample.com")
+                .Create();
 
             //Act
             PersonResponse person_response_from_add = await _personService.AddPerson(person_add_request);
@@ -251,32 +226,18 @@ namespace CRUDTests
         public async Task GetFilteredPersons_EmptySearchText()
         {
             //Arrange
-            CountryAddRequest country_add_request_1 = new CountryAddRequest() { CountryName = "UK" };
-            CountryAddRequest country_add_request_2 = new CountryAddRequest() { CountryName = "Poland" };
+            CountryAddRequest country_add_request_1 = _fixture.Create<CountryAddRequest>();
+            CountryAddRequest country_add_request_2 = _fixture.Create<CountryAddRequest>();
 
             CountryResponse country_response_1 = await _countriesService.AddCountry(country_add_request_1);
             CountryResponse country_response_2 = await _countriesService.AddCountry(country_add_request_2);
 
-            PersonAddRequest person_add_request_1 = new PersonAddRequest()
-            {
-                PersonName = "Person1",
-                Email = "person1@exmample.com",
-                DateOfBirth = DateTime.Parse("2003-03-03"),
-                Gender = GenderOptions.Female,
-                CountryID = country_response_1.CountryID,
-                Address = "addres1",
-                ReceiveNewsLetters = true
-            };
-            PersonAddRequest person_add_request_2 = new PersonAddRequest()
-            {
-                PersonName = "Person2",
-                Email = "person2@exmample.com",
-                DateOfBirth = DateTime.Parse("2003-03-03"),
-                Gender = GenderOptions.Male,
-                CountryID = country_response_2.CountryID,
-                Address = "addres2",
-                ReceiveNewsLetters = false
-            };
+            PersonAddRequest person_add_request_1 = _fixture.Build<PersonAddRequest>()
+                .With(temp => temp.Email, "email1@sample.com")
+                .Create();
+            PersonAddRequest person_add_request_2 = _fixture.Build<PersonAddRequest>()
+                .With(temp => temp.Email, "emai2l@sample.com")
+                .Create();
 
             List<PersonAddRequest> person_add_requests = new List<PersonAddRequest>()
             {
@@ -320,32 +281,22 @@ namespace CRUDTests
         public async Task GetFilteredPersons_SearchByPersonName()
         {
             //Arrange
-            CountryAddRequest country_add_request_1 = new CountryAddRequest() { CountryName = "UK" };
-            CountryAddRequest country_add_request_2 = new CountryAddRequest() { CountryName = "Poland" };
+            CountryAddRequest country_add_request_1 = _fixture.Create<CountryAddRequest>();
+            CountryAddRequest country_add_request_2 = _fixture.Create<CountryAddRequest>();
 
             CountryResponse country_response_1 = await _countriesService.AddCountry(country_add_request_1);
             CountryResponse country_response_2 = await _countriesService.AddCountry(country_add_request_2);
 
-            PersonAddRequest person_add_request_1 = new PersonAddRequest()
-            {
-                PersonName = "Mary",
-                Email = "person1@exmample.com",
-                DateOfBirth = DateTime.Parse("2003-03-03"),
-                Gender = GenderOptions.Female,
-                CountryID = country_response_1.CountryID,
-                Address = "addres1",
-                ReceiveNewsLetters = true
-            };
-            PersonAddRequest person_add_request_2 = new PersonAddRequest()
-            {
-                PersonName = "Rahman",
-                Email = "person2@exmample.com",
-                DateOfBirth = DateTime.Parse("2003-03-03"),
-                Gender = GenderOptions.Male,
-                CountryID = country_response_2.CountryID,
-                Address = "addres2",
-                ReceiveNewsLetters = false
-            };
+            PersonAddRequest person_add_request_1 = _fixture.Build<PersonAddRequest>()
+                .With(temp => temp.Email, "email1@sample.com")
+                .With(temp => temp.PersonName, "mary")
+                .With(temp => temp.CountryID, country_response_1.CountryID)
+                .Create();
+            PersonAddRequest person_add_request_2 = _fixture.Build<PersonAddRequest>()
+                .With(temp => temp.Email, "emai2l@sample.com")
+                .With(temp => temp.PersonName, "julia")
+                .With(temp => temp.CountryID, country_response_2.CountryID)
+                .Create();
 
             List<PersonAddRequest> person_add_requests = new List<PersonAddRequest>()
             {
@@ -392,32 +343,20 @@ namespace CRUDTests
 
         private async Task<List<PersonResponse>> MakePersonResponseList()
         {
-            CountryAddRequest country_add_request_1 = new CountryAddRequest() { CountryName = "UK" };
-            CountryAddRequest country_add_request_2 = new CountryAddRequest() { CountryName = "Poland" };
+            CountryAddRequest country_add_request_1 = _fixture.Create<CountryAddRequest>();
+            CountryAddRequest country_add_request_2 = _fixture.Create<CountryAddRequest>();
 
             CountryResponse country_response_1 = await _countriesService.AddCountry(country_add_request_1);
             CountryResponse country_response_2 = await _countriesService.AddCountry(country_add_request_2);
 
-            PersonAddRequest person_add_request_1 = new PersonAddRequest()
-            {
-                PersonName = "Mary",
-                Email = "person1@exmample.com",
-                DateOfBirth = DateTime.Parse("2003-03-03"),
-                Gender = GenderOptions.Female,
-                CountryID = country_response_1.CountryID,
-                Address = "addres1",
-                ReceiveNewsLetters = true
-            };
-            PersonAddRequest person_add_request_2 = new PersonAddRequest()
-            {
-                PersonName = "Rahman",
-                Email = "person2@exmample.com",
-                DateOfBirth = DateTime.Parse("2003-03-03"),
-                Gender = GenderOptions.Male,
-                CountryID = country_response_2.CountryID,
-                Address = "addres2",
-                ReceiveNewsLetters = false
-            };
+            PersonAddRequest person_add_request_1 = _fixture.Build<PersonAddRequest>()
+                .With(temp => temp.Email, "email1@sample.com")
+                .With(temp => temp.PersonName, "julia")
+                .Create();
+            PersonAddRequest person_add_request_2 = _fixture.Build<PersonAddRequest>()
+                .With(temp => temp.Email, "emai2l@sample.com")
+                .With(temp => temp.PersonName, "wersow")
+                .Create();
 
             List<PersonAddRequest> person_add_requests = new List<PersonAddRequest>()
             {
@@ -494,10 +433,7 @@ namespace CRUDTests
         public async Task UpdatePerson_EmptyPerson()
         {
             //Arrange
-            PersonUpdateRequest person_update_request = new PersonUpdateRequest()
-            {
-                PersonID = Guid.NewGuid(),
-            };
+            PersonUpdateRequest person_update_request = _fixture.Create<PersonUpdateRequest>();
 
             //Assert
             await Assert.ThrowsAsync<ArgumentException>(async () =>
@@ -512,11 +448,12 @@ namespace CRUDTests
         public async Task UpdatePerson_PersonNameIsNull()
         {
             //Arrange
-            CountryAddRequest country_add_request = new CountryAddRequest() { CountryName = "Poland" };
+            CountryAddRequest country_add_request = _fixture.Create<CountryAddRequest>();
             CountryResponse country_response_from_add = await _countriesService.AddCountry(country_add_request);
 
-            PersonAddRequest person_add_request = new PersonAddRequest() { PersonName = "Julia", Email = "person@exmaple.com", 
-            CountryID = country_response_from_add.CountryID, Gender = GenderOptions.Female };
+            PersonAddRequest person_add_request = _fixture.Build<PersonAddRequest>()
+                .With(temp => temp.Email, "emai2l@sample.com")
+                .Create();
             PersonResponse person_response = await _personService.AddPerson(person_add_request);
 
             PersonUpdateRequest? person_update_request = person_response.ToPersonUpdateRequest();
@@ -535,12 +472,13 @@ namespace CRUDTests
         public async Task UpdatePerson_PersonFullDetails()
         {
             //Arrange
-            CountryAddRequest country_add_request = new CountryAddRequest() { CountryName = "Poland" };
+            CountryAddRequest country_add_request = _fixture.Create<CountryAddRequest>();
             CountryResponse country_response_from_add = await _countriesService.AddCountry(country_add_request);
 
-            PersonAddRequest person_add_request = new PersonAddRequest() { PersonName = "Julia", Email = "person@exmaple.com", 
-            CountryID = country_response_from_add.CountryID,
-            Address = "addres1", DateOfBirth = DateTime.Parse("2003-02-03"), Gender = GenderOptions.Female, ReceiveNewsLetters = false};
+            PersonAddRequest person_add_request = _fixture.Build<PersonAddRequest>()
+                .With(temp => temp.Email, "emai2l@sample.com")
+                .With(temp => temp.CountryID, country_response_from_add.CountryID)
+                .Create();
             PersonResponse person_response = await _personService.AddPerson(person_add_request);
 
             PersonUpdateRequest? person_update_request = person_response.ToPersonUpdateRequest();
@@ -576,20 +514,14 @@ namespace CRUDTests
         public async Task DeletePerson_ValidPersonID()
         {
             //Arrange
-            CountryAddRequest country_add_request = new CountryAddRequest() { CountryName = "Poland" };
+            CountryAddRequest country_add_request = _fixture.Create<CountryAddRequest>();
             CountryResponse country_response_from_add = await _countriesService.AddCountry(country_add_request);
 
-            PersonAddRequest? personAddRequest = new PersonAddRequest()
-            {
-                PersonName = "Julia",
-                Email = "person@example.com",
-                Address = "sample address",
-                CountryID = country_response_from_add.CountryID,
-                Gender = GenderOptions.Male,
-                DateOfBirth = DateTime.Parse("2000-01-01"),
-                ReceiveNewsLetters = true
-            };
-            PersonResponse person_response_from_add = await _personService.AddPerson(personAddRequest);
+            PersonAddRequest person_add_request = _fixture.Build<PersonAddRequest>()
+                .With(temp => temp.Email, "emai2l@sample.com")
+                .With(temp => temp.CountryID, country_response_from_add.CountryID)
+                .Create();
+            PersonResponse person_response_from_add = await _personService.AddPerson(person_add_request);
 
             //Act
             bool isDeleted = await _personService.DeletePerson(person_response_from_add.PersonID);
