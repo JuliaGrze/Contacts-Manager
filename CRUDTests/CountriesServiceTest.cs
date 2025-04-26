@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Moq;
 
 
 namespace CRUDTests
@@ -18,7 +19,24 @@ namespace CRUDTests
 
         public CountriesServiceTest()
         {
-            _countriesService = new CountriesService(new PersonsDbContext(new DbContextOptionsBuilder<PersonsDbContext>().Options));
+            var countriesInitialData = new List<Country>();
+
+            //Tworzysz specjalny "budowniczy" (builder), który pomoże skonfigurować jak będzie działać Twój ApplicationDbContext
+            //Options = sposób, w jaki baza będzie działać (np. że będzie w pamięci, a nie na prawdziwym serwerze).
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) //// nowa baza dla każdego testu
+                .Options;
+
+            //Tworzysz bazę danych na podstawie tych wcześniej przygotowanych instrukcji (options).
+            //Czyli: "Masz tu gotowe ustawienia, teraz utwórz bazę według nich".
+            ApplicationDbContext dbContext = new ApplicationDbContext(options);
+
+            //dodanie danych startowych - dbSet
+            //tworzona jest nowa baza danych w pamięci (In-Memory Database), ale ta baza istnieje tylko podczas testów
+            dbContext.Countries.AddRange(countriesInitialData);
+            dbContext.SaveChanges();
+
+            _countriesService = new CountriesService(dbContext);
         }
 
         #region AddCountry

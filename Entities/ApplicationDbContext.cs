@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace Entities
 {
-    public class PersonsDbContext : DbContext
+    public class ApplicationDbContext : DbContext
     {
-        //łaściwości, które mówią EF, że chcesz pracować z tabelami Countries i Persons
+        //właściwości, które mówią EF, że chcesz pracować z tabelami Countries i Persons
         public DbSet<Country> Countries { get; set; }
         public DbSet<Person> Persons { get; set; }
 
         //Ten konstruktor umożliwia przekazanie konfiguracji bazy danych (np. connection stringa). 
-        public PersonsDbContext(DbContextOptions options) : base(options) { }
+        public ApplicationDbContext(DbContextOptions options) : base(options) { }
 
         //Określa jak klasy są mapowane na tabele oraz Pozwala na seedowanie danych (czyli dodanie danych początkowych).
         protected override void OnModelCreating(ModelBuilder modelBuilder)

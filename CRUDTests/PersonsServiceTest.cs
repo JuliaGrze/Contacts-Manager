@@ -1,5 +1,6 @@
 ﻿using Entities;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using ServiceContracts;
 using ServiceContracts.DTO;
 using ServiceContracts.Enums;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
+using AutoFixture;
 
 namespace CRUDTests
 {
@@ -19,13 +21,32 @@ namespace CRUDTests
         private readonly IPersonsService _personService;
         private readonly ICountriesService _countriesService;
         private readonly ITestOutputHelper _outputHelper;
+        private readonly IFixture _fixture;
 
         //constructor
         public PersonsServiceTest(ITestOutputHelper testOutputHelper)
         {
-            _countriesService = new CountriesService(new PersonsDbContext(new DbContextOptionsBuilder<PersonsDbContext>().Options));
-            _personService = new PersonsService(new PersonsDbContext(new DbContextOptionsBuilder<PersonsDbContext>().Options), _countriesService);
             _outputHelper = testOutputHelper;
+            _fixture = new Fixture();
+
+            var countriesInitialData = new List<Country>();
+            var personsInitialData = new List<Person>();
+
+            //options jak baza ma ddzialac
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+
+            //tworzenie bazy na podatwie stworzonych wyzej opcji
+            var dbContext = new ApplicationDbContext(options);
+
+            //dodanie danych startowych - dbSet
+            dbContext.Countries.AddRange(countriesInitialData);
+            dbContext.Persons.AddRange(personsInitialData);
+            dbContext.SaveChanges();
+
+            _countriesService = new CountriesService(dbContext);
+            _personService = new PersonsService(dbContext, _countriesService);
         }
 
         #region AddPeron
@@ -495,7 +516,7 @@ namespace CRUDTests
             CountryResponse country_response_from_add = await _countriesService.AddCountry(country_add_request);
 
             PersonAddRequest person_add_request = new PersonAddRequest() { PersonName = "Julia", Email = "person@exmaple.com", 
-            CountryID = country_response_from_add.CountryID };
+            CountryID = country_response_from_add.CountryID, Gender = GenderOptions.Female };
             PersonResponse person_response = await _personService.AddPerson(person_add_request);
 
             PersonUpdateRequest? person_update_request = person_response.ToPersonUpdateRequest();
