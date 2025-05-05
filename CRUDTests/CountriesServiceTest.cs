@@ -12,6 +12,7 @@ using Moq;
 using AutoFixture;
 using FluentAssertions;
 using Azure.Core;
+using RepositoryContracts;
 
 
 namespace CRUDTests
@@ -20,28 +21,38 @@ namespace CRUDTests
     {
         private readonly ICountriesService _countriesService;
         private readonly IFixture _fixture;
+        private readonly Mock<ICountriesRepository> _countriesRepositoryMock;
+
+        //public CountriesServiceTest()
+        //{
+        //    _fixture = new Fixture();
+        //    var countriesInitialData = new List<Country>();
+
+        //    //Tworzysz specjalny "budowniczy" (builder), który pomoże skonfigurować jak będzie działać Twój ApplicationDbContext
+        //    //Options = sposób, w jaki baza będzie działać (np. że będzie w pamięci, a nie na prawdziwym serwerze).
+        //    var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+        //        .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) //// nowa baza dla każdego testu
+        //        .Options;
+
+        //    //Tworzysz bazę danych na podstawie tych wcześniej przygotowanych instrukcji (options).
+        //    //Czyli: "Masz tu gotowe ustawienia, teraz utwórz bazę według nich".
+        //    ApplicationDbContext dbContext = new ApplicationDbContext(options);
+
+        //    //dodanie danych startowych - dbSet
+        //    //tworzona jest nowa baza danych w pamięci (In-Memory Database), ale ta baza istnieje tylko podczas testów
+        //    dbContext.Countries.AddRange(countriesInitialData);
+        //    dbContext.SaveChanges();
+
+        //    _countriesService = new CountriesService(null);
+        //}
 
         public CountriesServiceTest()
         {
             _fixture = new Fixture();
-            var countriesInitialData = new List<Country>();
 
-            //Tworzysz specjalny "budowniczy" (builder), który pomoże skonfigurować jak będzie działać Twój ApplicationDbContext
-            //Options = sposób, w jaki baza będzie działać (np. że będzie w pamięci, a nie na prawdziwym serwerze).
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) //// nowa baza dla każdego testu
-                .Options;
+            _countriesRepositoryMock = new Mock<ICountriesRepository>(); // ✅ utwórz mock repozytorium
 
-            //Tworzysz bazę danych na podstawie tych wcześniej przygotowanych instrukcji (options).
-            //Czyli: "Masz tu gotowe ustawienia, teraz utwórz bazę według nich".
-            ApplicationDbContext dbContext = new ApplicationDbContext(options);
-
-            //dodanie danych startowych - dbSet
-            //tworzona jest nowa baza danych w pamięci (In-Memory Database), ale ta baza istnieje tylko podczas testów
-            dbContext.Countries.AddRange(countriesInitialData);
-            dbContext.SaveChanges();
-
-            _countriesService = new CountriesService(null);
+            _countriesService = new CountriesService(_countriesRepositoryMock.Object); // ✅ użyj mocka
         }
 
         #region AddCountry
@@ -91,30 +102,39 @@ namespace CRUDTests
 
         //When CountryName is duplicate, it should throw ArgumentException
         [Fact]
-        public async Task AddCountry_DuplicateCountryName()
+        public async Task AddCountry_DuplicateCountryName_ShouldThrowArgumentException()
         {
-            //Arrange
-            CountryAddRequest? request1 = _fixture.Build<CountryAddRequest>()
-                .With(temp => temp.CountryName, "Poland")
-                .Create();
-            CountryAddRequest? request2 = _fixture.Build<CountryAddRequest>()
-                .With(temp => temp.CountryName, "Poland")
-                .Create();
+            // Arrange
+            var request1 = new CountryAddRequest() { CountryName = "Poland" };
+            var request2 = new CountryAddRequest() { CountryName = "Poland" };
 
-            //Assert
-            //await Assert.ThrowsAsync<ArgumentException>(async () =>
-            //{
-            //    //Act
-            //    await _countriesService.AddCountry(request1);
-            //    await _countriesService.AddCountry(request2);
-            //});
+            var countryEntity = new Country() { CountryName = "Poland" };
+
+            // 1. Gdy dodajesz pierwszy raz – nic nie istnieje
+            _countriesRepositoryMock.Setup(repo => repo.GetCountryByCountryName("Poland"))
+                .ReturnsAsync((Country?)null);
+
+            // 2. Gdy dodajesz drugi raz – symulujemy, że taki kraj już istnieje
+            _countriesRepositoryMock.SetupSequence(repo => repo.GetCountryByCountryName("Poland"))
+                .ReturnsAsync((Country?)null)       // dla request1
+                .ReturnsAsync(countryEntity);       // dla request2
+
+            _countriesRepositoryMock.Setup(repo => repo.AddCountry(It.IsAny<Country>()))
+                .ReturnsAsync((Country c) => c);
+
+            // Act
             Func<Task> action = async () =>
             {
                 await _countriesService.AddCountry(request1);
-                await _countriesService.AddCountry(request2);
+                await _countriesService.AddCountry(request2); // powinien rzucić wyjątek
             };
+
+            // Assert
             await action.Should().ThrowAsync<ArgumentException>();
+               
         }
+
+
 
         //When you supply proper CountryName, it should insert (add) the country to the existing list of countries
         [Fact]
@@ -123,15 +143,15 @@ namespace CRUDTests
             //Arrange
             CountryAddRequest request = _fixture.Create<CountryAddRequest>();
 
+            _countriesRepositoryMock.Setup(repo => repo.AddCountry(It.IsAny<Country>()))
+                .ReturnsAsync((Country c) => c);
+
             //Act
             CountryResponse response = await _countriesService.AddCountry(request);
-            List<CountryResponse> countries_from_GetAllCountries = await _countriesService.GetAllCountries();
 
             //Assert
             //Assert.True(response.CountryID != Guid.Empty);
             response.CountryID.Should().NotBe(Guid.Empty);
-            //Assert.Contains(response, countries_from_GetAllCountries);
-            countries_from_GetAllCountries.Should().Contain(response);
         }
 
         #endregion
@@ -143,32 +163,37 @@ namespace CRUDTests
         [Fact]
         public async Task GetAllCountries_EmptyList()
         {
-            //Acts
+            // Arrange
+            _countriesRepositoryMock.Setup(repo => repo.GetAllCountries())
+                .ReturnsAsync(new List<Country>()); // Mockowanie pustej listy
+
+            // Act
             List<CountryResponse> actual_country_response_list = await _countriesService.GetAllCountries();
 
-            //Assert
-            //Assert.Empty(actual_country_response_list);
-            actual_country_response_list.Should().BeEmpty();
+            // Assert
+            actual_country_response_list.Should().BeEmpty(); // Oczekujemy pustej listy
         }
+
 
         // It checks whether all countries in the request list are present in the response after being added.
         [Fact]
         public async Task GetAllCountries_AddFewCountries()
         {
             //Arrange
-            List<CountryAddRequest> country_request_list = new List<CountryAddRequest>()
+            var countries = new List<Country>
             {
-                _fixture.Create<CountryAddRequest>(),
-                _fixture.Create<CountryAddRequest>(),
-                _fixture.Create<CountryAddRequest>(),
+                 new Country { CountryID = Guid.NewGuid(), CountryName = "Poland" },
+                new Country { CountryID = Guid.NewGuid(), CountryName = "Germany" },
+                new Country { CountryID = Guid.NewGuid(), CountryName = "France" }
             };
 
+
             //Act
-            List<CountryResponse> countries_list_from_add_country = new List<CountryResponse>();
-            foreach (CountryAddRequest country_request in country_request_list)
-            {
-                countries_list_from_add_country.Add(await _countriesService.AddCountry(country_request));
-            }
+            List<CountryResponse> countries_list_from_add_country = countries.Select(temp => temp.ToCountryResponse()).ToList();
+
+            _countriesRepositoryMock.Setup(temp => temp.GetAllCountries())
+                .ReturnsAsync(countries);
+
             List<CountryResponse> actualCountryResponseList = await _countriesService.GetAllCountries();
 
             //read each element from countries_list_from_add_country
