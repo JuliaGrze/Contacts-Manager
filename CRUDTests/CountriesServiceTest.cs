@@ -41,7 +41,7 @@ namespace CRUDTests
             dbContext.Countries.AddRange(countriesInitialData);
             dbContext.SaveChanges();
 
-            _countriesService = new CountriesService(dbContext);
+            _countriesService = new CountriesService(null);
         }
 
         #region AddCountry
