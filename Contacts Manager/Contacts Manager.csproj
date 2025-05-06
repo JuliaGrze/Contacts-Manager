@@ -36,6 +36,12 @@
     <Content Update="persons.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="wwwroot\Rotativa\wkhtmltopdf.exe">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="CRUDTests" />
+	</ItemGroup>
 </Project>

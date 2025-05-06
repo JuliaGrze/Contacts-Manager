@@ -18,10 +18,13 @@ builder.Services.AddScoped<IPersonsService, PersonsService>();
 builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
 builder.Services.AddScoped<IPersonsRepository, PersonsRepository>();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+if (!builder.Environment.IsEnvironment("Test"))
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    {
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    });
+}
 
 var app = builder.Build();
 
@@ -31,7 +34,8 @@ if (builder.Environment.IsDevelopment())
 }
 
 //PDF
-Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", wkhtmltopdfRelativePath: "Rotativa");
+if(!builder.Environment.IsEnvironment("Test"))
+    Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", wkhtmltopdfRelativePath: "Rotativa");
 
 //Excel
 ExcelPackage.License.SetNonCommercialPersonal("Julia");
@@ -42,3 +46,6 @@ app.UseRouting(); //W³¹cza system trasowania (routing middleware)
 app.MapControllers();
 
 app.Run();
+
+//do integration test
+public partial class Program { } // make the auto-generated Program accessible programmaticaly

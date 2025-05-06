@@ -85,7 +85,7 @@ namespace Contacts_Manager.Controllers
                     .Select(e => e.ErrorMessage)
                     .ToList();
 
-                return View();
+                return View(personAddRequest);
             }
             //call the service method
             PersonResponse personResponse = await _personsService.AddPerson(personAddRequest);
